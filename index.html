@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RifqyTask</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light {
+      background: #f4f4f4;
+      color: #000;
+    }
+    body.dark {
+      background: #121212;
+      color: #f0f0f0;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+    input, select {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+    }
+    button {
+      padding: 10px;
+      width: 100%;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #e2e2e2;
+      margin-bottom: 5px;
+      padding: 10px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    body.dark li {
+      background: #333;
+    }
+    .stats {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .toggle {
+      margin: 10px auto;
+      display: block;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>RifqyTask</h1>
+  <div class="container">
+    <div class="toggle">
+      <button onclick="toggleDarkMode()">🌗 Toggle Mode</button>
+    </div>
+    <input type="text" id="taskTitle" placeholder="Judul tugas" />
+    <input type="date" id="taskDue" />
+    <select id="taskCategory">
+      <option value="Sekolah">Sekolah</option>
+      <option value="Kerja">Kerja</option>
+      <option value="Coding">Coding</option>
+      <option value="Pribadi">Pribadi</option>
+    </select>
+    <button onclick="addTask()">Tambah Tugas</button>
+
+    <h2>Daftar Tugas</h2>
+    <ul id="taskList"></ul>
+
+    <div class="stats">
+      <p><strong>Tugas Selesai:</strong> <span id="doneCount">0</span></p>
+    </div>
+  </div>
+
+  <script>
+    const taskList = document.getElementById("taskList");
+    const doneCount = document.getElementById("doneCount");
+    let tasks = JSON.parse(localStorage.getItem("rifqyTasks")) || [];
+
+    function saveTasks() {
+      localStorage.setItem("rifqyTasks", JSON.stringify(tasks));
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = "";
+      let done = 0;
+      tasks.forEach((task, index) => {
+        const li = document.createElement("li");
+        const label = document.createElement("label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.completed;
+        checkbox.onchange = () => {
+          tasks[index].completed = checkbox.checked;
+          saveTasks();
+          renderTasks();
+        };
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(` ${task.title} (${task.category}) - ${task.due}`));
+        li.appendChild(label);
+        taskList.appendChild(li);
+        if (task.completed) done++;
+      });
+      doneCount.textContent = done;
+    }
+
+    function addTask() {
+      const title = document.getElementById("taskTitle").value;
+      const due = document.getElementById("taskDue").value;
+      const category = document.getElementById("taskCategory").value;
+
+      if (!title || !due) return alert("Judul dan tanggal wajib diisi!");
+
+      tasks.push({ title, due, category, completed: false });
+      saveTasks();
+      renderTasks();
+
+      document.getElementById("taskTitle").value = "";
+      document.getElementById("taskDue").value = "";
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+      document.body.classList.toggle("light");
+      localStorage.setItem("rifqyTheme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+
+    function applyTimeBasedTheme() {
+      const saved = localStorage.getItem("rifqyTheme");
+      if (saved) {
+        document.body.classList.add(saved);
+      } else {
+        const hour = new Date().getHours();
+        if (hour >= 18 || hour < 6) {
+          document.body.classList.add("dark");
+        } else {
+          document.body.classList.add("light");
+        }
+      }
+    }
+
+    applyTimeBasedTheme();
+    renderTasks();
+  </script>
+</body>
+</html>
