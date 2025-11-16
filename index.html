@@ -57,6 +57,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       transition: transform 0.2s ease;
     }
     body.dark .task-card {
@@ -65,6 +66,9 @@
     .task-card:hover {
       transform: scale(1.02);
     }
+    .task-info {
+      flex: 1 1 70%;
+    }
     .task-info p {
       margin: 5px 0 0;
       font-size: 0.9em;
@@ -72,6 +76,15 @@
     }
     body.dark .task-info p {
       color: #ccc;
+    }
+    .task-actions {
+      flex: 1 1 25%;
+      text-align: right;
+    }
+    .task-actions button {
+      background: #dc3545;
+      margin-top: 5px;
+      font-size: 0.8em;
     }
     .stats {
       text-align: center;
@@ -108,6 +121,16 @@
     }
     .toast.show {
       opacity: 1;
+    }
+    @media (max-width: 600px) {
+      .task-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .task-actions {
+        text-align: left;
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -154,18 +177,29 @@
       setTimeout(() => toast.classList.remove("show"), 2000);
     }
 
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      saveTasks();
+      renderTasks();
+    }
+
     function renderTasks() {
       taskList.innerHTML = "";
       let done = 0;
       tasks.forEach((task, index) => {
         const li = document.createElement("li");
         li.className = "task-card";
+
         const info = document.createElement("div");
         info.className = "task-info";
         const icon = task.category.includes("Sekolah") ? "🎓" :
                      task.category.includes("Kerja") ? "💼" :
                      task.category.includes("Coding") ? "💻" : "🧘";
         info.innerHTML = `<strong>${icon} ${task.title}</strong><p>Deadline: ${task.due}</p>`;
+
+        const actions = document.createElement("div");
+        actions.className = "task-actions";
+
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.checked = task.completed;
@@ -174,8 +208,17 @@
           saveTasks();
           renderTasks();
         };
+        actions.appendChild(checkbox);
+
+        if (task.completed) {
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Hapus";
+          delBtn.onclick = () => deleteTask(index);
+          actions.appendChild(delBtn);
+        }
+
         li.appendChild(info);
-        li.appendChild(checkbox);
+        li.appendChild(actions);
         taskList.appendChild(li);
         if (task.completed) done++;
       });
