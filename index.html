@@ -55,9 +55,8 @@
       padding: 15px;
       margin-bottom: 10px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 10px;
       transition: transform 0.2s ease;
     }
     body.dark .task-card {
@@ -67,24 +66,37 @@
       transform: scale(1.02);
     }
     .task-info {
-      flex: 1 1 70%;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .task-info strong {
+      font-size: 1rem;
     }
     .task-info p {
-      margin: 5px 0 0;
-      font-size: 0.9em;
+      font-size: 0.85rem;
       color: #666;
+      margin: 0;
     }
     body.dark .task-info p {
       color: #ccc;
     }
     .task-actions {
-      flex: 1 1 25%;
-      text-align: right;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .task-actions input[type="checkbox"] {
+      transform: scale(1.2);
     }
     .task-actions button {
       background: #dc3545;
-      margin-top: 5px;
       font-size: 0.8em;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      color: white;
+      cursor: pointer;
     }
     .stats {
       text-align: center;
@@ -121,16 +133,6 @@
     }
     .toast.show {
       opacity: 1;
-    }
-    @media (max-width: 600px) {
-      .task-card {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .task-actions {
-        text-align: left;
-        width: 100%;
-      }
     }
   </style>
 </head>
